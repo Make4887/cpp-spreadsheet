@@ -145,32 +145,29 @@ public:
     double Evaluate(const SheetInterface& sheet) const override {
         double left_velue = lhs_->Evaluate(sheet);
         double right_value = rhs_->Evaluate(sheet);
+        double res;
         switch (type_) {
             case Add:
-                if (std::isfinite(left_velue + right_value)) {
-                    return left_velue + right_value;
-                }
-                throw FormulaError(FormulaError::Category::Arithmetic);
+                res = left_velue + right_value;
+                break;
             case Subtract:
-                if (std::isfinite(left_velue - right_value)) {
-                    return left_velue - right_value;
-                }
-                throw FormulaError(FormulaError::Category::Arithmetic);
+                res = left_velue - right_value;
+                break;
             case Multiply:
-                if (std::isfinite(left_velue * right_value)) {
-                    return left_velue * right_value;
-                }
-                throw FormulaError(FormulaError::Category::Arithmetic);
+                res = left_velue * right_value;
+                break;
             case Divide:
-                if (std::isfinite(left_velue / right_value)) {
-                    return left_velue / right_value;
-                }
-                throw FormulaError(FormulaError::Category::Arithmetic);
+                res = left_velue / right_value;
+                break;
             default:
                 // have to do this because VC++ has a buggy warning
                 assert(false);
                 return static_cast<ExprPrecedence>(INT_MAX);
-    }
+        }
+        if (std::isfinite(res)) {
+            return res;
+        }
+        throw FormulaError(FormulaError::Category::Arithmetic);
     }
 
 private:

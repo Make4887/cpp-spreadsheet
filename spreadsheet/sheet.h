@@ -22,8 +22,6 @@ public:
     void PrintValues(std::ostream& output) const override;
     void PrintTexts(std::ostream& output) const override;
 
-    void MakeEmptyCell(Position pos);
-
 private:
     std::vector<std::vector<std::unique_ptr<Cell>>> data_;
     Size size_;

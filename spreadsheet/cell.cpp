@@ -45,7 +45,7 @@ public:
     return std::get<FormulaError>(res);
 }
     std::string GetText() const override {
-        return '=' + formula_->GetExpression();
+        return FORMULA_SIGN + formula_->GetExpression();
     }
     std::vector<Position> GetReferencedCells() const{
         return formula_->GetReferencedCells();
@@ -65,19 +65,24 @@ void Cell::Set(std::string text) {
         auto new_formula_impl = std::make_unique<FormulaImpl>(text.substr(1));
         auto new_referenced_cells = new_formula_impl->GetReferencedCells();
         for(auto cell: new_referenced_cells){
-            sheet_.MakeEmptyCell(cell);
+            auto cell_ptr = sheet_.GetCell(cell);
+            if(!cell_ptr){
+                sheet_.SetCell(cell, "");
+            }
             dynamic_cast<const Cell*>(sheet_.GetCell(cell))->CheckCycle(this);
         }
         impl_ = std::move(new_formula_impl);
         down_nodes_.clear();
         down_nodes_.insert(new_referenced_cells.begin(), new_referenced_cells.end());
-        ClearCache();
     }
-    else if(!text.empty() || (text.empty() && !GetText().empty())){
+    else if(!text.empty()){
         impl_ = std::make_unique<TextImpl>(std::move(text));
         down_nodes_.clear();
-        ClearCache();
+    }else if(text.empty() && !GetText().empty()){
+        impl_ = std::make_unique<EmptyImpl>();
+        down_nodes_.clear();
     }
+    ClearCache();
 }
 
 void Cell::Clear() {

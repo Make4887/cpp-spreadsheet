@@ -11,23 +11,6 @@
 using namespace std::literals;
 
 void Sheet::SetCell(Position pos, std::string text) {
-    MakeEmptyCell(pos);
-    if(data_[pos.row][pos.col]->GetText() == text && !text.empty()){
-        return;
-    }
-    data_[pos.row][pos.col]->Set(std::move(text));
-    for(auto referenced_cell: data_[pos.row][pos.col]->GetReferencedCells()){
-        dynamic_cast<Cell*>(GetCell(referenced_cell))->AddUpNode(pos);
-    }
-    if (size_.cols <= pos.col) {
-        size_.cols = pos.col + 1;
-    }
-    if (size_.rows <= pos.row) {
-        size_.rows = pos.row + 1;
-    }
-}
-
-void Sheet::MakeEmptyCell(Position pos){
     CheckPosition(pos);
     int row_size = 0;
     if (!data_.empty()) {
@@ -45,13 +28,27 @@ void Sheet::MakeEmptyCell(Position pos){
     }
     if (!data_[pos.row][pos.col]) {
         data_[pos.row][pos.col] = std::make_unique<Cell>(*this);
-
+    }
+    if(data_[pos.row][pos.col]->GetText() == text && !text.empty()){
+        return;
+    }
+    data_[pos.row][pos.col]->Set(std::move(text));
+    for(auto referenced_cell: data_[pos.row][pos.col]->GetReferencedCells()){
+        dynamic_cast<Cell*>(GetCell(referenced_cell))->AddUpNode(pos);
+    }
+    if (size_.cols <= pos.col) {
+        size_.cols = pos.col + 1;
+    }
+    if (size_.rows <= pos.row) {
+        size_.rows = pos.row + 1;
     }
 }
 
 const CellInterface* Sheet::GetCell(Position pos) const {
     CheckPosition(pos);
-    if (pos.row >= static_cast<int>(data_.size()) || pos.col >= static_cast<int>(data_[0].size()) || !data_[pos.row][pos.col]) {
+    if (pos.row >= static_cast<int>(data_.size()) ||
+        pos.col >= static_cast<int>(data_[0].size()) ||
+        !data_[pos.row][pos.col]) {
         return nullptr;
     }
     return data_[pos.row][pos.col].get();
@@ -59,7 +56,9 @@ const CellInterface* Sheet::GetCell(Position pos) const {
 
 CellInterface* Sheet::GetCell(Position pos) {
     CheckPosition(pos);
-    if (pos.row >= static_cast<int>(data_.size()) || pos.col >= static_cast<int>(data_[0].size()) || !data_[pos.row][pos.col]) {
+    if (pos.row >= static_cast<int>(data_.size()) ||
+        pos.col >= static_cast<int>(data_[0].size()) ||
+        !data_[pos.row][pos.col]) {
         return nullptr;
     }
     return data_[pos.row][pos.col].get();

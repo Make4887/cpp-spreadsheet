@@ -22,7 +22,7 @@ public:
     {
     }
     catch (...) {
-        throw FormulaException("");
+        throw FormulaException("Formula Parsing Error");
     }
     Value Evaluate(const SheetInterface& sheet) const override {
         try {

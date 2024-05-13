@@ -10,8 +10,6 @@ class Cell;
 
 class Sheet : public SheetInterface {
 public:
-    ~Sheet();
-
     void SetCell(Position pos, std::string text) override;
 
     const CellInterface* GetCell(Position pos) const override;
@@ -29,4 +27,6 @@ public:
 private:
     std::vector<std::vector<std::unique_ptr<Cell>>> data_;
     Size size_;
+
+    void CheckPosition(Position pos) const;
 };

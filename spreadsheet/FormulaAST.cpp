@@ -143,33 +143,34 @@ public:
     }
 
     double Evaluate(const SheetInterface& sheet) const override {
-        // Скопируйте ваше решение из предыдущих уроков.
-            switch (type_) {
-                case Add:
-                    if (std::isfinite(lhs_->Evaluate(sheet) + rhs_->Evaluate(sheet))) {
-                        return lhs_->Evaluate(sheet) + rhs_->Evaluate(sheet);
-                    }
-                    throw FormulaError(FormulaError::Category::Arithmetic);
-                case Subtract:
-                    if (std::isfinite(lhs_->Evaluate(sheet) - rhs_->Evaluate(sheet))) {
-                        return lhs_->Evaluate(sheet) - rhs_->Evaluate(sheet);
-                    }
-                    throw FormulaError(FormulaError::Category::Arithmetic);
-                case Multiply:
-                    if (std::isfinite(lhs_->Evaluate(sheet) * rhs_->Evaluate(sheet))) {
-                        return lhs_->Evaluate(sheet) * rhs_->Evaluate(sheet);
-                    }
-                    throw FormulaError(FormulaError::Category::Arithmetic);
-                case Divide:
-                    if (std::isfinite(lhs_->Evaluate(sheet) / rhs_->Evaluate(sheet))) {
-                        return lhs_->Evaluate(sheet) / rhs_->Evaluate(sheet);
-                    }
-                    throw FormulaError(FormulaError::Category::Arithmetic);
-                default:
-                    // have to do this because VC++ has a buggy warning
-                    assert(false);
-                    return static_cast<ExprPrecedence>(INT_MAX);
-        }
+        double left_velue = lhs_->Evaluate(sheet);
+        double right_value = rhs_->Evaluate(sheet);
+        switch (type_) {
+            case Add:
+                if (std::isfinite(left_velue + right_value)) {
+                    return left_velue + right_value;
+                }
+                throw FormulaError(FormulaError::Category::Arithmetic);
+            case Subtract:
+                if (std::isfinite(left_velue - right_value)) {
+                    return left_velue - right_value;
+                }
+                throw FormulaError(FormulaError::Category::Arithmetic);
+            case Multiply:
+                if (std::isfinite(left_velue * right_value)) {
+                    return left_velue * right_value;
+                }
+                throw FormulaError(FormulaError::Category::Arithmetic);
+            case Divide:
+                if (std::isfinite(left_velue / right_value)) {
+                    return left_velue / right_value;
+                }
+                throw FormulaError(FormulaError::Category::Arithmetic);
+            default:
+                // have to do this because VC++ has a buggy warning
+                assert(false);
+                return static_cast<ExprPrecedence>(INT_MAX);
+    }
     }
 
 private:
@@ -207,7 +208,6 @@ public:
     }
 
     double Evaluate(const SheetInterface& sheet) const override {
-        // Скопируйте ваше решение из предыдущих уроков.
         return type_ == Type::UnaryPlus ? operand_->Evaluate(sheet) : -operand_->Evaluate(sheet);
     }
 
@@ -239,7 +239,6 @@ public:
     }
 
     double Evaluate(const SheetInterface& sheet) const override {
-        // реализуйте метод.
         if(!cell_->IsValid()){
             throw FormulaError(FormulaError::Category::Ref);
         }

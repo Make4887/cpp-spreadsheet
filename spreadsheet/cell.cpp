@@ -54,7 +54,6 @@ private:
     std::unique_ptr<FormulaInterface> formula_;
 };
 
-// Реализуйте следующие методы
 Cell::Cell(Sheet& sheet)
     : sheet_(sheet)
     , impl_(std::make_unique<EmptyImpl>())
@@ -72,22 +71,17 @@ void Cell::Set(std::string text) {
         impl_ = std::move(new_formula_impl);
         down_nodes_.clear();
         down_nodes_.insert(new_referenced_cells.begin(), new_referenced_cells.end());
+        ClearCache();
     }
-    else {
+    else if(!text.empty() || (text.empty() && !GetText().empty())){
         impl_ = std::make_unique<TextImpl>(std::move(text));
         down_nodes_.clear();
+        ClearCache();
     }
-    ClearCache();
-}
-
-bool Cell::IsEmpty() const{
-    return dynamic_cast<EmptyImpl*>(impl_.get());
 }
 
 void Cell::Clear() {
-    impl_ = std::make_unique<EmptyImpl>();
-    ClearCache();
-    down_nodes_.clear();
+    Set("");
 }
 
 Cell::Value Cell::GetValue() const {
@@ -115,7 +109,7 @@ void Cell::AddUpNode(const Position& pos){
 
 void Cell::CheckCycle(const Cell* root_cell) const{
     if(root_cell == this){
-        throw CircularDependencyException("");
+        throw CircularDependencyException("Circular Dependency Error");
     }
     for(auto cell: down_nodes_){
         dynamic_cast<const Cell*>(sheet_.GetCell(cell))->CheckCycle(root_cell);

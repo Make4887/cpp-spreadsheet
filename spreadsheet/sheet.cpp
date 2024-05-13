@@ -10,8 +10,6 @@
 
 using namespace std::literals;
 
-Sheet::~Sheet() {}
-
 void Sheet::SetCell(Position pos, std::string text) {
     MakeEmptyCell(pos);
     if(data_[pos.row][pos.col]->GetText() == text && !text.empty()){
@@ -30,9 +28,7 @@ void Sheet::SetCell(Position pos, std::string text) {
 }
 
 void Sheet::MakeEmptyCell(Position pos){
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("");
-    }
+    CheckPosition(pos);
     int row_size = 0;
     if (!data_.empty()) {
         row_size = static_cast<int>(data_[0].size());
@@ -54,18 +50,15 @@ void Sheet::MakeEmptyCell(Position pos){
 }
 
 const CellInterface* Sheet::GetCell(Position pos) const {
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("");
-    }
+    CheckPosition(pos);
     if (pos.row >= static_cast<int>(data_.size()) || pos.col >= static_cast<int>(data_[0].size()) || !data_[pos.row][pos.col]) {
         return nullptr;
     }
     return data_[pos.row][pos.col].get();
 }
+
 CellInterface* Sheet::GetCell(Position pos) {
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("");
-    }
+    CheckPosition(pos);
     if (pos.row >= static_cast<int>(data_.size()) || pos.col >= static_cast<int>(data_[0].size()) || !data_[pos.row][pos.col]) {
         return nullptr;
     }
@@ -73,19 +66,17 @@ CellInterface* Sheet::GetCell(Position pos) {
 }
 
 void Sheet::ClearCell(Position pos) {
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("");
-    }
+    CheckPosition(pos);
     if (pos.col >= size_.cols || pos.row >= size_.rows) {
         return;
     }
     data_[pos.row][pos.col] = nullptr;
     bool empty = true;
-    for (int i = size_.rows - 1; i >= 0; --i) {
-        for (int j = 0; j < size_.cols; ++j) {
-            if (data_[i][j]) {
-                size_.rows = i + 1;
-                i = -1;
+    for (int row = size_.rows - 1; row >= 0; --row) {
+        for (int col = 0; col < size_.cols; ++col) {
+            if (data_[row][col]) {
+                size_.rows = row + 1;
+                --row;
                 empty = false;
                 break;
             }
@@ -97,11 +88,11 @@ void Sheet::ClearCell(Position pos) {
         size_.cols = 0;
     }
 
-    for (int j = size_.cols - 1; j >= 0; --j) {
-        for (int i = 0; i < size_.rows; ++i) {
-            if (data_[i][j]) {
-                size_.cols = j + 1;
-                j = -1;
+    for (int col = size_.cols - 1; col >= 0; --col) {
+        for (int row = 0; row < size_.rows; ++row) {
+            if (data_[row][col]) {
+                size_.cols = col + 1;
+                --col;
                 break;
             }
         }
@@ -136,6 +127,7 @@ void Sheet::PrintValues(std::ostream& output) const {
         }
     }
 }
+
 void Sheet::PrintTexts(std::ostream& output) const {
     for (int i = 0; i < size_.rows; ++i) {
         for (int j = 0; j < size_.cols; ++j) {
@@ -154,4 +146,10 @@ void Sheet::PrintTexts(std::ostream& output) const {
 
 std::unique_ptr<SheetInterface> CreateSheet() {
     return std::make_unique<Sheet>();
+}
+
+void Sheet::CheckPosition(Position pos) const {
+    if (!pos.IsValid()) {
+        throw InvalidPositionException("Invalid Position Error");
+    }
 }

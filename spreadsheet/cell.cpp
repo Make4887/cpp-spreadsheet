@@ -63,16 +63,6 @@ Cell::Cell(Sheet& sheet)
 
 void Cell::Set(std::string text) {
     if (text.size() > 1 && text[0] == FORMULA_SIGN) {
-        auto it = text.begin() + 1;
-        while (it != text.end() && isupper(*it)) {
-            ++it;
-        }
-        while (it != text.end() && it != text.begin() + 1 && isdigit(*it)) {
-            ++it;
-        }
-        if(it != text.begin() + 1 && it != text.end() && isalpha(*it)){
-            throw FormulaException("");
-        }
         auto new_formula_impl = std::make_unique<FormulaImpl>(text.substr(1));
         auto new_referenced_cells = new_formula_impl->GetReferencedCells();
         for(auto cell: new_referenced_cells){

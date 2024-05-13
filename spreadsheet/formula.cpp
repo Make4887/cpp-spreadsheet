@@ -17,7 +17,6 @@ std::ostream& operator<<(std::ostream& output, FormulaError fe) {
 namespace {
 class Formula : public FormulaInterface {
 public:
-    // Реализуйте следующие методы:
     explicit Formula(std::string expression) try
         :ast_(ParseFormulaAST(expression))
     {

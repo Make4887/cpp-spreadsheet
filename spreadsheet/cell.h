@@ -24,7 +24,6 @@ public:
         return {res.begin(), res.end()};
     }
 
-    bool IsReferenced() const;
     bool IsEmpty() const;
     void AddUpNode(const Position& pos);
 
@@ -51,8 +50,6 @@ private:
     };
 
     std::unique_ptr<Impl> impl_;
-    // Добавьте поля и методы для связи с таблицей, проверки циклических 
-    // зависимостей, графа зависимостей и т. д.
     
     mutable std::optional<Value> cache_;
     std::unordered_set<Position, PositionHasher> up_nodes_;

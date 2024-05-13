@@ -26,10 +26,7 @@ public:
 
     void MakeEmptyCell(Position pos);
 
-    // Можете дополнить ваш класс нужными полями и методами
-
 private:
-    // Можете дополнить ваш класс нужными полями и методами
     std::vector<std::vector<std::unique_ptr<Cell>>> data_;
     Size size_;
 };

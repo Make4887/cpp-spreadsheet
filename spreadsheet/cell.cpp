@@ -68,8 +68,9 @@ void Cell::Set(std::string text) {
             auto cell_ptr = sheet_.GetCell(cell);
             if(!cell_ptr){
                 sheet_.SetCell(cell, "");
+                cell_ptr = sheet_.GetCell(cell);
             }
-            dynamic_cast<const Cell*>(sheet_.GetCell(cell))->CheckCycle(this);
+            dynamic_cast<const Cell*>(cell_ptr)->CheckCycle(this);
         }
         impl_ = std::move(new_formula_impl);
         down_nodes_.clear();
